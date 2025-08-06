@@ -1,0 +1,106 @@
+/* src/index.css */
+
+/* Remova ou comente estilos que possam estar centralizando */
+/* Exemplo: */
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0; /* Mantenha isso para remover margem padrão do navegador */
+  display: flex; /* Pode remover ou ajustar se for o caso */
+  place-items: center; /* Pode remover ou ajustar se for o caso */
+  min-width: 320px;
+  min-height: 100vh;
+
+  /* Remova ou comente se estiverem centralizando */
+  /* display: flex; */
+  /* place-items: center; */
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+#root {
+  /* Remova max-width, margin: 0 auto, padding, text-align */
+  /* Deixe apenas o essencial ou nada aqui se o Bootstrap gerenciar */
+  width: 100%; /* Garanta que o #root ocupe 100% da largura */
+  min-height: 100vh; /* Para que ele ocupe a altura total */
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
+/* Garante que o submenu se posicione corretamente */
+.dropdown-menu .dropdown-menu {
+  margin-top: 0;
+  margin-left: 0.1rem; /* Pequeno espaçamento lateral */
+  position: absolute;
+}
+
+/* Regra para exibir o submenu ao passar o mouse ou focar no item pai */
+.dropdown-item.dropend .dropdown-menu {
+  display: none; /* Esconde por padrão */
+  left: 100%; /* Posiciona à direita do item pai */
+  top: 0;
+}
+
+/* Exibe o submenu quando o item pai (dropend) está com hover ou focus */
+/* Para navegadores maiores */
+@media (min-width: 992px) {
+  /* Exemplo para tela lg, ajuste conforme sua navbar-expand-X */
+  .dropdown-item.dropend:hover > .dropdown-menu,
+  .dropdown-item.dropend > .dropdown-toggle:focus + .dropdown-menu {
+    display: block; /* Mostra o submenu */
+  }
+}

@@ -123,20 +123,10 @@ The Task Management System is a web application designed to help users organize 
 
 * Mark tasks as completed with a single click.
 
-4. ### **📆 Calendar View**
-* Track your tasks using a calendar view to better plan your week or month.
-
-5. ### **🔔 Reminders and Notifications**
+4. ### **🔔 Reminders and Notifications**
 * Receive automatic alerts for tasks nearing their deadlines.
 
-6. ### **👥 Additional Features (Depending on the Course Schedule)**
-* Multi-user support and team task management (User Management).
-
-* Assign tasks to different users and track their progress (User Management).
-
-* Automatic task prioritization (based on deadlines, urgency, and impact).
-
-* Integration with email, Slack, Notion, or Google Calendar (for task import and synchronization).
+5. ### **👥 Additional Features (Depending on the Course Schedule)**
 
 * Per-task or per-project chat (with message history).
 

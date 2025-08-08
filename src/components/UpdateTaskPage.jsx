@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
+import { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 
 // Opções de Status e Prioridade para as caixas de seleção
 const STATUS_OPTIONS = [
@@ -15,44 +15,52 @@ const PRIORITY_OPTIONS = [
 ];
 
 function UpdateTaskPage({ idTask, onUpdateTaskSuccess }) {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [date, setDate] = useState('');
-  const [hour, setHour] = useState('');
-  const [status, setStatus] = useState('');
-  const [priority, setPriority] = useState('');
-  const [message, setMessage] = useState('');
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [date, setDate] = useState("");
+  const [hour, setHour] = useState("");
+  const [status, setStatus] = useState("");
+  const [priority, setPriority] = useState("");
+  const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchTask = async () => {
       if (!idTask) {
-        setMessage('Nenhum ID de tarefa fornecido para atualização.');
+        setMessage("Nenhum ID de tarefa fornecido para atualização.");
         return;
       }
 
       setIsLoading(true);
       setError(null);
-      setMessage('');
+      setMessage("");
 
       try {
-        const response = await fetch(`http://localhost:8080/tasks/${idTask}`);
+        const response = await fetch(`http://localhost:8080/tasks/${idTask}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        });
         if (response.ok) {
           const taskData = await response.json();
           setTitle(taskData.title);
-          setDescription(taskData.description || ''); // Garante que a descrição não seja 'null'
+          setDescription(taskData.description || ""); // Garante que a descrição não seja 'null'
           setDate(taskData.date);
           setHour(taskData.hour.substring(0, 5));
           setStatus(taskData.status || STATUS_OPTIONS[0].value);
           setPriority(taskData.priority || PRIORITY_OPTIONS[0].value);
         } else {
           const errorData = await response.json();
-          setError(`Erro ao carregar tarefa: ${errorData.message || 'Tarefa não encontrada.'}`);
+          setError(
+            `Erro ao carregar tarefa: ${
+              errorData.message || "Tarefa não encontrada."
+            }`
+          );
         }
       } catch (err) {
         setError(`Erro de conexão ao carregar tarefa: ${err.message}`);
-        console.error('Erro ao buscar tarefa:', err);
+        console.error("Erro ao buscar tarefa:", err);
       } finally {
         setIsLoading(false);
       }
@@ -64,43 +72,56 @@ function UpdateTaskPage({ idTask, onUpdateTaskSuccess }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (!title.trim() || !date.trim() || !hour.trim() || !status.trim() || !priority.trim()) {
-      setMessage('Título, data e hora são obrigatórios!');
+    if (
+      !title.trim() ||
+      !date.trim() ||
+      !hour.trim() ||
+      !status.trim() ||
+      !priority.trim()
+    ) {
+      setMessage("Título, data e hora são obrigatórios!");
       return;
     }
 
     const updatedTask = {
       title: title,
-      description: description.trim() === '' ? null : description,
+      description: description.trim() === "" ? null : description,
       date: date,
-      hour: hour + ':00',
+      hour: hour + ":00",
       status: status,
       priority: priority,
     };
 
     try {
       const response = await fetch(`http://localhost:8080/tasks/${idTask}`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
         },
         body: JSON.stringify(updatedTask),
       });
 
       if (response.ok) {
         const data = await response.json();
-        setMessage(`Tarefa "${data.title}" (ID: ${data.id}) atualizada com sucesso!`);
+        setMessage(
+          `Tarefa "${data.title}" (ID: ${data.id}) atualizada com sucesso!`
+        );
         if (onUpdateTaskSuccess) {
           onUpdateTaskSuccess(); // Chama o callback de sucesso
         }
       } else {
         const errorData = await response.json();
-        setMessage(`Erro ao atualizar tarefa: ${errorData.message || 'Lembre-se de preencher todos os campos'}`);
-        console.error('Erro ao atualizar tarefa:', errorData);
+        setMessage(
+          `Erro ao atualizar tarefa: ${
+            errorData.message || "Lembre-se de preencher todos os campos"
+          }`
+        );
+        console.error("Erro ao atualizar tarefa:", errorData);
       }
     } catch (err) {
       setMessage(`Erro de conexão: ${err.message}`);
-      console.error('Erro na requisição PUT:', err);
+      console.error("Erro na requisição PUT:", err);
     }
   };
 
@@ -127,11 +148,20 @@ function UpdateTaskPage({ idTask, onUpdateTaskSuccess }) {
   }
 
   if (!idTask) {
-      return (
-          <div className="container mt-5 alert alert-info">
-              <p>Por favor, forneça o ID da tarefa que deseja atualizar na página de <button className="btn btn-link p-0" onClick={() => window.location.reload()}>Visualizar Tarefas</button>.</p>
-          </div>
-      );
+    return (
+      <div className="container mt-5 alert alert-info">
+        <p>
+          Por favor, forneça o ID da tarefa que deseja atualizar na página de{" "}
+          <button
+            className="btn btn-link p-0"
+            onClick={() => window.location.reload()}
+          >
+            Visualizar Tarefas
+          </button>
+          .
+        </p>
+      </div>
+    );
   }
 
   return (
@@ -140,14 +170,21 @@ function UpdateTaskPage({ idTask, onUpdateTaskSuccess }) {
       <p>Edite os campos abaixo para atualizar a tarefa.</p>
 
       {message && (
-        <div className={`alert ${message.includes('sucesso') ? 'alert-success' : 'alert-danger'}`} role="alert">
+        <div
+          className={`alert ${
+            message.includes("sucesso") ? "alert-success" : "alert-danger"
+          }`}
+          role="alert"
+        >
           {message}
         </div>
       )}
 
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
-          <label htmlFor="taskTitle" className="form-label">Título</label>
+          <label htmlFor="taskTitle" className="form-label">
+            Título
+          </label>
           <input
             type="text"
             className="form-control"
@@ -159,7 +196,9 @@ function UpdateTaskPage({ idTask, onUpdateTaskSuccess }) {
           />
         </div>
         <div className="mb-3">
-          <label htmlFor="taskDescription" className="form-label">Descrição</label>
+          <label htmlFor="taskDescription" className="form-label">
+            Descrição
+          </label>
           <textarea
             className="form-control"
             id="taskDescription"
@@ -172,7 +211,9 @@ function UpdateTaskPage({ idTask, onUpdateTaskSuccess }) {
 
         <div className="row mb-3">
           <div className="col-md-6">
-            <label htmlFor="taskStatus" className="form-label">Status (Obrigatório)</label>
+            <label htmlFor="taskStatus" className="form-label">
+              Status (Obrigatório)
+            </label>
             <select
               id="taskStatus"
               className="form-select"
@@ -180,13 +221,17 @@ function UpdateTaskPage({ idTask, onUpdateTaskSuccess }) {
               onChange={(e) => setStatus(e.target.value)}
               required
             >
-              {STATUS_OPTIONS.map(option => (
-                <option key={option.value} value={option.value}>{option.label}</option>
+              {STATUS_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
               ))}
             </select>
           </div>
           <div className="col-md-6">
-            <label htmlFor="taskPriority" className="form-label">Prioridade (Obrigatório)</label>
+            <label htmlFor="taskPriority" className="form-label">
+              Prioridade (Obrigatório)
+            </label>
             <select
               id="taskPriority"
               className="form-select"
@@ -194,15 +239,19 @@ function UpdateTaskPage({ idTask, onUpdateTaskSuccess }) {
               onChange={(e) => setPriority(e.target.value)}
               required
             >
-              {PRIORITY_OPTIONS.map(option => (
-                <option key={option.value} value={option.value}>{option.label}</option>
+              {PRIORITY_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
               ))}
             </select>
           </div>
         </div>
 
         <div className="mb-3">
-          <label htmlFor="taskDate" className="form-label">Data</label>
+          <label htmlFor="taskDate" className="form-label">
+            Data
+          </label>
           <input
             type="date"
             className="form-control"
@@ -213,7 +262,9 @@ function UpdateTaskPage({ idTask, onUpdateTaskSuccess }) {
           />
         </div>
         <div className="mb-3">
-          <label htmlFor="taskHour" className="form-label">Hora</label>
+          <label htmlFor="taskHour" className="form-label">
+            Hora
+          </label>
           <input
             type="time"
             className="form-control"
@@ -223,7 +274,9 @@ function UpdateTaskPage({ idTask, onUpdateTaskSuccess }) {
             required
           />
         </div>
-        <button type="submit" className="btn btn-warning">Atualizar Tarefa</button>
+        <button type="submit" className="btn btn-warning">
+          Atualizar Tarefa
+        </button>
       </form>
     </div>
   );

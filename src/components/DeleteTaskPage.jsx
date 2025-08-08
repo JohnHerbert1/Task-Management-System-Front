@@ -1,37 +1,45 @@
-import { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
+import { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 
 function DeleteTaskPage({ idTask, onTaskDeleted, onCancel }) {
   const [task, setTask] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const fetchTask = async () => {
       if (!idTask) {
-        setError('Nenhum ID de tarefa fornecido para exclusão.');
+        setError("Nenhum ID de tarefa fornecido para exclusão.");
         setIsLoading(false);
         return;
       }
 
       setIsLoading(true);
       setError(null);
-      setMessage('');
+      setMessage("");
 
       try {
-        const response = await fetch(`http://localhost:8080/tasks/${idTask}`);
+        const response = await fetch(`http://localhost:8080/tasks/${idTask}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        });
         if (response.ok) {
           const taskData = await response.json();
           setTask(taskData);
         } else {
           const errorData = await response.json();
-          setError(`Erro ao carregar tarefa: ${errorData.message || 'Tarefa não encontrada.'}`);
+          setError(
+            `Erro ao carregar tarefa: ${
+              errorData.message || "Tarefa não encontrada."
+            }`
+          );
         }
       } catch (err) {
         setError(`Erro de conexão ao carregar tarefa: ${err.message}`);
-        console.error('Erro ao buscar tarefa para exclusão:', err);
+        console.error("Erro ao buscar tarefa para exclusão:", err);
       } finally {
         setIsLoading(false);
       }
@@ -44,27 +52,32 @@ function DeleteTaskPage({ idTask, onTaskDeleted, onCancel }) {
     if (!task || isDeleting) return;
 
     setIsDeleting(true);
-    setMessage('');
+    setMessage("");
     setError(null);
 
     try {
       const response = await fetch(`http://localhost:8080/tasks/${idTask}`, {
-        method: 'DELETE',
+        method: "DELETE",
+        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
       });
 
       if (response.ok) {
-        setMessage(`Tarefa "${task.title}" (ID: ${task.id}) apagada com sucesso!`);
+        setMessage(
+          `Tarefa "${task.title}" (ID: ${task.id}) apagada com sucesso!`
+        );
         if (onTaskDeleted) {
           onTaskDeleted();
         }
       } else {
         const errorData = await response.json();
-        setError(`Erro ao apagar tarefa: ${errorData.message || 'Erro desconhecido'}`);
-        console.error('Erro ao apagar tarefa:', errorData);
+        setError(
+          `Erro ao apagar tarefa: ${errorData.message || "Erro desconhecido"}`
+        );
+        console.error("Erro ao apagar tarefa:", errorData);
       }
     } catch (err) {
       setError(`Erro de conexão: ${err.message}`);
-      console.error('Erro na requisição DELETE:', err);
+      console.error("Erro na requisição DELETE:", err);
     } finally {
       setIsDeleting(false);
     }
@@ -88,7 +101,9 @@ function DeleteTaskPage({ idTask, onTaskDeleted, onCancel }) {
           {error}
         </div>
         <p>Por favor, verifique o ID da tarefa ou tente novamente.</p>
-        <button className="btn btn-secondary mt-3" onClick={onCancel}>Voltar</button>
+        <button className="btn btn-secondary mt-3" onClick={onCancel}>
+          Voltar
+        </button>
       </div>
     );
   }
@@ -97,7 +112,9 @@ function DeleteTaskPage({ idTask, onTaskDeleted, onCancel }) {
     return (
       <div className="container mt-5 alert alert-info">
         <p>Nenhuma tarefa encontrada para o ID fornecido.</p>
-        <button className="btn btn-secondary mt-3" onClick={onCancel}>Voltar</button>
+        <button className="btn btn-secondary mt-3" onClick={onCancel}>
+          Voltar
+        </button>
       </div>
     );
   }
@@ -110,14 +127,19 @@ function DeleteTaskPage({ idTask, onTaskDeleted, onCancel }) {
         <p>
           <strong>ID:</strong> {task.id} <br />
           <strong>Título:</strong> {task.title} <br />
-          <strong>Descrição:</strong> {task.description || 'N/A'} <br />
+          <strong>Descrição:</strong> {task.description || "N/A"} <br />
           <strong>Data:</strong> {task.date} <br />
           <strong>Hora:</strong> {task.hour}
         </p>
       </div>
 
       {message && (
-        <div className={`alert ${message.includes('sucesso') ? 'alert-success' : 'alert-danger'}`} role="alert">
+        <div
+          className={`alert ${
+            message.includes("sucesso") ? "alert-success" : "alert-danger"
+          }`}
+          role="alert"
+        >
           {message}
         </div>
       )}
@@ -127,7 +149,7 @@ function DeleteTaskPage({ idTask, onTaskDeleted, onCancel }) {
         onClick={handleDelete}
         disabled={isDeleting}
       >
-        {isDeleting ? 'Apagando...' : 'Sim, Apagar'}
+        {isDeleting ? "Apagando..." : "Sim, Apagar"}
       </button>
       <button
         className="btn btn-secondary"

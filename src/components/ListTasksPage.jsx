@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
+import { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 
 // Definição para status e prioridade para os filtros
 const STATUS_OPTIONS = [
@@ -7,42 +7,54 @@ const STATUS_OPTIONS = [
   { value: "pending", label: "Pendente" },
   { value: "in_progress", label: "Em andamento" },
   { value: "completed", label: "Concluída" },
-]
+];
 
 const PRIORITY_OPTIONS = [
   { value: "all", label: "Todas as prioridades" },
   { value: "high", label: "Alta" },
   { value: "medium", label: "Média" },
   { value: "low", label: "Baixa" },
-]
+];
 
-function ListTasksPage({ onEditTask, onDeleteTask, onTaskCreatedOrUpdatedOrDeleted }) {
+function ListTasksPage({
+  onEditTask,
+  onDeleteTask,
+  onTaskCreatedOrUpdatedOrDeleted,
+}) {
   const [tasks, setTasks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [idInput, setIdInput] = useState('');
-  const [message, setMessage] = useState('');
+  const [idInput, setIdInput] = useState("");
+  const [message, setMessage] = useState("");
 
   // Novos estados para os filtros
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [priorityFilter, setPriorityFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [priorityFilter, setPriorityFilter] = useState("all");
 
   const fetchTasks = async () => {
     setIsLoading(true);
     setError(null);
-    setMessage('');
+    setMessage("");
     try {
-      const response = await fetch('http://localhost:8080/tasks');
+      const response = await fetch("http://localhost:8080/tasks", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      });
       if (response.ok) {
         const data = await response.json();
         setTasks(data);
       } else {
         const errorData = await response.json();
-        setError(`Erro ao carregar tarefas: ${errorData.message || 'Erro desconhecido'}`);
+        setError(
+          `Erro ao carregar tarefas: ${
+            errorData.message || "Erro desconhecido"
+          }`
+        );
       }
     } catch (err) {
       setError(`Erro de conexão: ${err.message}`);
-      console.error('Erro ao buscar tarefas:', err);
+      console.error("Erro ao buscar tarefas:", err);
     } finally {
       setIsLoading(false);
     }
@@ -55,20 +67,20 @@ function ListTasksPage({ onEditTask, onDeleteTask, onTaskCreatedOrUpdatedOrDelet
   // Função para lidar com a atualização por ID
   const handleUpdateById = () => {
     if (idInput.trim()) {
-      setMessage('');
+      setMessage("");
       onEditTask(idInput);
     } else {
-      setMessage('Por favor, digite um ID para atualizar.');
+      setMessage("Por favor, digite um ID para atualizar.");
     }
   };
 
   // Função para lidar com a exclusão por ID
   const handleDeleteById = () => {
     if (idInput.trim()) {
-      setMessage('');
+      setMessage("");
       onDeleteTask(idInput);
     } else {
-      setMessage('Por favor, digite um ID para apagar.');
+      setMessage("Por favor, digite um ID para apagar.");
     }
   };
 
@@ -81,8 +93,9 @@ function ListTasksPage({ onEditTask, onDeleteTask, onTaskCreatedOrUpdatedOrDelet
 
   // Lógica de filtro: cria uma nova lista com base nos estados do fitro
   const filteredTasks = tasks.filter((task) => {
-    const statusMatch = statusFilter === 'all' || task.status === statusFilter;
-    const priorityMatch = priorityFilter === 'all' || task.priority === priorityFilter;
+    const statusMatch = statusFilter === "all" || task.status === statusFilter;
+    const priorityMatch =
+      priorityFilter === "all" || task.priority === priorityFilter;
     return statusMatch && priorityMatch;
   });
 
@@ -103,7 +116,9 @@ function ListTasksPage({ onEditTask, onDeleteTask, onTaskCreatedOrUpdatedOrDelet
         <div className="alert alert-info" role="alert">
           {error}
         </div>
-        <button className="btn btn-info mt-3" onClick={fetchTasks}>Tentar Recarregar</button>
+        <button className="btn btn-info mt-3" onClick={fetchTasks}>
+          Tentar Recarregar
+        </button>
       </div>
     );
   }
@@ -114,7 +129,12 @@ function ListTasksPage({ onEditTask, onDeleteTask, onTaskCreatedOrUpdatedOrDelet
       <p>Abaixo está a lista completa de tarefas cadastradas.</p>
 
       {message && (
-        <div className={`alert ${message.includes('Erro') ? 'alert-danger' : 'alert-info'}`} role="alert">
+        <div
+          className={`alert ${
+            message.includes("Erro") ? "alert-danger" : "alert-info"
+          }`}
+          role="alert"
+        >
           {message}
         </div>
       )}
@@ -124,28 +144,36 @@ function ListTasksPage({ onEditTask, onDeleteTask, onTaskCreatedOrUpdatedOrDelet
         <h5 className="card-title">Filtrar tarefas</h5>
         <div className="row g-3">
           <div className="col-md-6">
-            <label htmlFor="statusFilter" className="form-label">Status</label>
+            <label htmlFor="statusFilter" className="form-label">
+              Status
+            </label>
             <select
               id="statusFilter"
               className="form-select"
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
             >
-              {STATUS_OPTIONS.map(option => (
-                <option key={option.value} value={option.value}>{option.label}</option>
+              {STATUS_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
               ))}
             </select>
           </div>
           <div className="col-md-6">
-            <label htmlFor="priorityFilter" className="form-label">Prioridade</label>
+            <label htmlFor="priorityFilter" className="form-label">
+              Prioridade
+            </label>
             <select
               id="priorityFilter"
               className="form-select"
               value={priorityFilter}
               onChange={(e) => setPriorityFilter(e.target.value)}
             >
-              {PRIORITY_OPTIONS.map(option => (
-                <option key={option.value} value={option.value}>{option.label}</option>
+              {PRIORITY_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
               ))}
             </select>
           </div>
@@ -163,16 +191,10 @@ function ListTasksPage({ onEditTask, onDeleteTask, onTaskCreatedOrUpdatedOrDelet
             value={idInput}
             onChange={(e) => setIdInput(e.target.value)}
           />
-          <button
-            className="btn btn-warning"
-            onClick={handleUpdateById}
-          >
+          <button className="btn btn-warning" onClick={handleUpdateById}>
             Atualizar
           </button>
-          <button
-            className="btn btn-danger"
-            onClick={handleDeleteById}
-          >
+          <button className="btn btn-danger" onClick={handleDeleteById}>
             Apagar
           </button>
         </div>
@@ -197,7 +219,7 @@ function ListTasksPage({ onEditTask, onDeleteTask, onTaskCreatedOrUpdatedOrDelet
             </tr>
           </thead>
           <tbody>
-            {filteredTasks.map(task => (
+            {filteredTasks.map((task) => (
               <tr key={task.id}>
                 <th scope="row">{task.id}</th>
                 <td>{task.title}</td>

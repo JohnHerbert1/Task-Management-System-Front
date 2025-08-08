@@ -47,6 +47,7 @@ function Forms({ onFlip }) {
       // Exemplo: se houver token, armazena
       if (data.token) {
         localStorage.setItem("authToken", data.token);
+        console.log(data.token);
       }
 
       alert("Login realizado com sucesso!");

@@ -1,10 +1,16 @@
-import { useState } from "react";
+// src/App.jsx
+import React, { useState } from "react";
 import BaseBoard from "./components/BaseBoard";
 import NavBarLog from "./components/NavBarLog";
+
 import AddTaskPage from "./components/AddTaskPage";
+import ListTasksPage from "./components/ListTasksPage";
 import UpdateTaskPage from "./components/UpdateTaskPage";
 import DeleteTaskPage from "./components/DeleteTaskPage";
-import ListTasksPage from "./components/ListTasksPage";
+
+import ListUsersPage from "./components/ListUsersPage";
+import UpdateUserPage from "./components/UpdateUserPage";
+import DeleteUserPage from "./components/DeleteUserPage";
 
 const PAGE_VIEWS = {
   HOME: "home",
@@ -12,118 +18,193 @@ const PAGE_VIEWS = {
   VIEW_TASKS: "viewTasks",
   UPDATE_TASK: "updateTask",
   DELETE_TASK: "deleteTask",
+
+  VIEW_USERS: "viewUsers",
+  UPDATE_USER: "updateUser",
+  DELETE_USER: "deleteUser",
 };
 
-function App() {
+export default function App() {
   const [currentPage, setCurrentPage] = useState(PAGE_VIEWS.HOME);
+
+  // tarefas
   const [taskToUpdateId, setTaskToUpdateId] = useState(null);
   const [taskToDeleteId, setTaskToDeleteId] = useState(null);
-  const [shouldReloadTasks, setShouldReloadTasks] = useState(false); // Novo estado para recarregar lista
-  const [theme, setTheme] = useState("light")
+  const [shouldReloadTasks, setShouldReloadTasks] = useState(false);
 
-  const toggleTheme = () => {
-    setTheme(currentTheme => (currentTheme === "light" ? "dark" : "light"));
-  }
+  // usuários
+  const [userToDeleteId, setUserToDeleteId] = useState(null);
+  const [shouldReloadUsers, setShouldReloadUsers] = useState(false);
 
-  // Função para mostrar a página de adicionar tarefa
-  const handleShowAddTaskPage = () => {
+  // tema
+  const [theme, setTheme] = useState("light");
+  const toggleTheme = () => setTheme((t) => (t === "light" ? "dark" : "light"));
+
+  // --- HANDLERS DE TAREFAS ---
+  function handleShowAddTaskPage() {
     setCurrentPage(PAGE_VIEWS.ADD_TASK);
-    setShouldReloadTasks(false); // Garante que não recarregue imediatamente
-  };
-
-  // Função para mostrar a página de visualizar tarefas (listagem)
-  const handleShowViewTasksPage = () => {
+    setShouldReloadTasks(false);
+  }
+  function handleShowViewTasksPage() {
     setCurrentPage(PAGE_VIEWS.VIEW_TASKS);
-    setTaskToUpdateId(null); // Limpa IDs ao ir para a visualização
+    setShouldReloadTasks(true);
+    setTaskToUpdateId(null);
     setTaskToDeleteId(null);
-    setShouldReloadTasks(true); // Sinaliza para recarregar a lista
-  };
-
-  // Funções passadas para ListTasksPage para iniciar Atualização/Exclusão
-  const handleEditTask = (id) => {
+  }
+  function handleEditTask(id) {
     setTaskToUpdateId(id);
     setCurrentPage(PAGE_VIEWS.UPDATE_TASK);
-  };
-
-  // Função para apagar uma tarefa
-  const handleDeleteTask = (id) => {
+  }
+  function handleDeleteTask(id) {
     setTaskToDeleteId(id);
     setCurrentPage(PAGE_VIEWS.DELETE_TASK);
-  };
-
-  // Callback para quando uma tarefa é ADICIONADA com sucesso
-  const handleAddTaskSuccess = () => {
-    setShouldReloadTasks(true); // Sinaliza para recarregar a lista (no ListTasksPage)
-  };
-
-  // Função de callback após uma tarefa ser ATUALIZADA/DELETADA
-  const handleUpdateOrDeleteTaskCompleted = () => {
-    setTaskToUpdateId(null);
-    setTaskToDeleteId(null);
-    setCurrentPage(PAGE_VIEWS.VIEW_TASKS); // Volta para a lista
-    setShouldReloadTasks(true); // Sinaliza para recarregar a lista
-  };
-
-  // Função para cancelar a exclusão de uma tarefa
-  const handleCancelDelete = () => {
-    setTaskToDeleteId(null);
-    setCurrentPage(PAGE_VIEWS.VIEW_TASKS); // Volta para a lista
-    setShouldReloadTasks(true); // Sinaliza para recarregar a lista
-  };
-
-  const handleHomeClick = () => {
-    setCurrentPage(PAGE_VIEWS.HOME);
-    setTaskToUpdateId(null);
-    setTaskToDeleteId(null);
-    setShouldReloadTasks(false);  // Reseta qualquer necessidade de recarregar
+  }
+  function handleTaskDone() {
+    setShouldReloadTasks(true);
+    setCurrentPage(PAGE_VIEWS.VIEW_TASKS);
   }
 
-  const renderMainContent = () => {
+  // --- HANDLERS DE USUÁRIOS ---
+  function handleShowListUsersPage() {
+    setCurrentPage(PAGE_VIEWS.VIEW_USERS);
+    setShouldReloadUsers(true);
+    setUserToDeleteId(null);
+  }
+  function handleShowUpdateUserPage() {
+    setCurrentPage(PAGE_VIEWS.UPDATE_USER);
+  }
+  function handleDeleteUser(id) {
+    setUserToDeleteId(id);
+    setCurrentPage(PAGE_VIEWS.DELETE_USER);
+  }
+  function handleUserDone() {
+    setShouldReloadUsers(true);
+    setCurrentPage(PAGE_VIEWS.VIEW_USERS);
+  }
+
+  // HOME
+  function handleHomeClick() {
+    setCurrentPage(PAGE_VIEWS.HOME);
+  }
+
+  // RENDERIZA O CONTEÚDO PRINCIPAL
+  function renderMainContent() {
     switch (currentPage) {
+      // ===== TAREFAS =====
       case PAGE_VIEWS.ADD_TASK:
-        // Passa a nova função de callback específica para adicionar
-        return <AddTaskPage onCreateTaskSuccess={handleAddTaskSuccess} />;
+        return <AddTaskPage onCreateTaskSuccess={handleTaskDone} />;
+
       case PAGE_VIEWS.VIEW_TASKS:
         return (
           <ListTasksPage
             onEditTask={handleEditTask}
             onDeleteTask={handleDeleteTask}
-            onTaskCreatedOrUpdatedOrDeleted={shouldReloadTasks} // Passa o estado para recarregar
+            shouldReload={shouldReloadTasks}
           />
         );
+
       case PAGE_VIEWS.UPDATE_TASK:
-        if (taskToUpdateId) {
-          // Usa a função de callback para atualização
-          return <UpdateTaskPage idTask={taskToUpdateId} onUpdateTaskSuccess={handleUpdateOrDeleteTaskCompleted} />;
-        } else {
+        if (!taskToUpdateId) {
           return (
             <div className="container mt-5 alert alert-info">
-              <p>Por favor, selecione uma tarefa para editar na <button className="btn btn-link p-0" onClick={handleShowViewTasksPage}>Visualizar Tarefas</button>.</p>
+              Selecione uma tarefa para editar em{" "}
+              <button
+                className="btn btn-link p-0"
+                onClick={handleShowViewTasksPage}
+              >
+                Visualizar Tarefas
+              </button>
+              .
             </div>
           );
         }
+        return (
+          <UpdateTaskPage
+            idTask={taskToUpdateId}
+            onUpdateTaskSuccess={handleTaskDone}
+          />
+        );
+
       case PAGE_VIEWS.DELETE_TASK:
-        if (taskToDeleteId) {
-          // Usa a função de callback para exclusão
-          return <DeleteTaskPage idTask={taskToDeleteId} onTaskDeleted={handleUpdateOrDeleteTaskCompleted} onCancel={handleCancelDelete} />;
-        } else {
+        if (!taskToDeleteId) {
           return (
             <div className="container mt-5 alert alert-info">
-              <p>Por favor, selecione uma tarefa para apagar na <button className="btn btn-link p-0" onClick={handleShowViewTasksPage}>Visualizar Tarefas</button>.</p>
+              Selecione uma tarefa para apagar em{" "}
+              <button
+                className="btn btn-link p-0"
+                onClick={handleShowViewTasksPage}
+              >
+                Visualizar Tarefas
+              </button>
+              .
             </div>
           );
         }
+        return (
+          <DeleteTaskPage
+            idTask={taskToDeleteId}
+            onTaskDeleted={handleTaskDone}
+            onCancel={handleTaskDone}
+          />
+        );
+
+      // ===== USUÁRIOS =====
+      case PAGE_VIEWS.VIEW_USERS:
+        return (
+          <ListUsersPage
+            onDeleteUser={handleDeleteUser}
+            shouldReload={shouldReloadUsers}
+          />
+        );
+
+      case PAGE_VIEWS.UPDATE_USER:
+        return <UpdateUserPage onUserUpdated={handleUserDone} />;
+
+      case PAGE_VIEWS.DELETE_USER:
+        if (!userToDeleteId) {
+          return (
+            <div className="container mt-5 alert alert-info">
+              Selecione um usuário para deletar em{" "}
+              <button
+                className="btn btn-link p-0"
+                onClick={handleShowListUsersPage}
+              >
+                Visualizar Usuários
+              </button>
+              .
+            </div>
+          );
+        }
+        return (
+          <DeleteUserPage
+            idUser={userToDeleteId}
+            onUserDeleted={handleUserDone}
+            onCancel={handleUserDone}
+          />
+        );
+
+      // ===== HOME =====
       case PAGE_VIEWS.HOME:
       default:
-        // Renderização da página inicial com o botão de tema
         return (
-          <div className={`container mt-5 text-${theme === 'light' ? 'dark' : 'light'}`}>
+          <div
+            className={`container mt-5 text-${
+              theme === "light" ? "dark" : "light"
+            }`}
+          >
             <h1>Bem-vindo ao Gerenciador de Tarefas!</h1>
             <p>Selecione uma opção no menu acima para começar.</p>
+            <div className="text-center mt-4">
+              <img
+                src="/imgs/darksouls.gif"
+                alt="Dark Souls Bonfire"
+                style={{ maxWidth: "100%", height: "auto" }}
+              />
+            </div>
           </div>
         );
     }
-  };
+  }
 
   return (
     <div
@@ -131,20 +212,16 @@ function App() {
       style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
     >
       <NavBarLog
+        onHomeClick={handleHomeClick}
         onAddTaskClick={handleShowAddTaskPage}
         onViewTasksClick={handleShowViewTasksPage}
-        onHomeClick={handleHomeClick}   // Função para voltar para "home"
+        onVisualizarUsuariosClick={handleShowListUsersPage}
+        onAtualizarUsuariosClick={handleShowUpdateUserPage}
+        onToggleTheme={toggleTheme}
         theme={theme}
-        onToggleTheme={toggleTheme}     // Função para alternar o tema
       />
-
-      <div style={{ flexGrow: 1 }}>
-        {renderMainContent()}
-      </div>
-
+      <div style={{ flexGrow: 1 }}>{renderMainContent()}</div>
       <BaseBoard theme={theme} />
     </div>
   );
 }
-
-export default App;

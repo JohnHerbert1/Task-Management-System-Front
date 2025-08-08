@@ -1,189 +1,163 @@
 // src/components/NavBarLog.jsx
-import PropTypes from 'prop-types';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import PropTypes from "prop-types";
+import { useNavigate } from "react-router-dom";
+import { FaLightbulb } from "react-icons/fa";
 
-function NavBarLog({
-  onVisualizarUsuariosClick,
-  onAdicionarUsuariosClick,
+export default function NavBarLog({
+  onHomeClick,
   onAddTaskClick,
   onViewTasksClick,
-  onHomeClick,
-  theme,
+  onVisualizarUsuariosClick,
+  onAtualizarUsuariosClick,
   onToggleTheme,
-  onLogout,                 // recebido do App.jsx
+  theme,
 }) {
   const navigate = useNavigate();
-  const token = localStorage.getItem('authToken');
+  const token = localStorage.getItem("authToken");
   const isLoggedIn = !!token;
+  const [bulbOn, setBulbOn] = useState(theme === "dark");
 
-  const handleLogout = async (e) => {
-    e.preventDefault();
-    // chama seu endpoint de logout (opcional, pode remover se não quiser esperar)
-    await fetch('http://localhost:8080/user/logout', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    localStorage.removeItem('authToken');
-    if (onLogout) onLogout();
-    navigate('/');  // volta pra login
+  const handleThemeToggle = () => {
+    setBulbOn(!bulbOn);
+    onToggleTheme();
   };
 
   return (
     <nav
-      className={`navbar navbar-expand-lg bg-${theme === 'light' ? 'light' : 'dark'}`}
-      data-bs-theme={theme === 'light' ? 'light' : 'dark'}
+      className={`navbar navbar-expand-lg bg-${theme}`}
+      data-bs-theme={theme}
     >
       <div className="container-fluid">
-        <a className="navbar-brand" href="#" onClick={e => { e.preventDefault(); onHomeClick(); }}>
+        <a
+          className="navbar-brand"
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            onHomeClick();
+          }}
+        >
           Painel
         </a>
-
         <button
           className="navbar-toggler"
           type="button"
           data-bs-toggle="collapse"
-          data-bs-target="#navbarColor02"
-          aria-controls="navbarColor02"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
+          data-bs-target="#navbarNav"
         >
           <span className="navbar-toggler-icon"></span>
         </button>
-
-        <div className="collapse navbar-collapse" id="navbarColor02">
+        <div className="collapse navbar-collapse" id="navbarNav">
           {isLoggedIn && (
             <ul className="navbar-nav me-auto">
               <li className="nav-item">
                 <a
-                  className="nav-link active"
+                  className="nav-link"
                   href="#"
-                  onClick={e => { e.preventDefault(); onHomeClick(); }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onHomeClick();
+                  }}
                 >
                   Início
-                  <span className="visually-hidden">(current)</span>
                 </a>
               </li>
+
               <li className="nav-item dropdown">
                 <a
                   className="nav-link dropdown-toggle"
-                  data-bs-toggle="dropdown"
                   href="#"
-                  role="button"
-                  aria-haspopup="true"
-                  aria-expanded="false"
+                  data-bs-toggle="dropdown"
                 >
                   Tarefas
                 </a>
-                <div className="dropdown-menu">
-                  <a
-                    className="dropdown-item"
-                    href="#"
-                    onClick={e => { e.preventDefault(); onAddTaskClick(); }}
-                  >
-                    Adicionar
-                  </a>
-                  <a
-                    className="dropdown-item"
-                    href="#"
-                    onClick={e => { e.preventDefault(); onViewTasksClick(); }}
-                  >
-                    Visualizar
-                  </a>
-                </div>
+                <ul className="dropdown-menu">
+                  <li>
+                    <a
+                      className="dropdown-item"
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        onAddTaskClick();
+                      }}
+                    >
+                      Adicionar
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      className="dropdown-item"
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        onViewTasksClick();
+                      }}
+                    >
+                      Visualizar
+                    </a>
+                  </li>
+                </ul>
               </li>
-              <li className="nav-item">
-                <a className="nav-link" href="/agenda">Agendas</a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link" href="/sobre">Sobre</a>
-              </li>
+
               <li className="nav-item dropdown">
                 <a
                   className="nav-link dropdown-toggle"
-                  data-bs-toggle="dropdown"
                   href="#"
-                  role="button"
-                  aria-haspopup="true"
-                  aria-expanded="false"
+                  data-bs-toggle="dropdown"
                 >
-                  Monitoramento
+                  Usuários
                 </a>
-                <div className="dropdown-menu">
-                  <div className="dropstart">
+                <ul className="dropdown-menu">
+                  <li>
                     <a
-                      className="dropdown-item dropdown-toggle"
+                      className="dropdown-item"
                       href="#"
-                      data-bs-toggle="dropdown"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        onVisualizarUsuariosClick();
+                      }}
                     >
-                      Usuários
+                      Visualizar Usuários
                     </a>
-                    <ul className="dropdown-menu">
-                      <li>
-                        <a
-                          className="dropdown-item"
-                          href="#"
-                          onClick={e => {
-                            e.preventDefault();
-                            onAdicionarUsuariosClick?.();
-                          }}
-                        >
-                          Adicionar Usuário
-                        </a>
-                      </li>
-                      <li>
-                        <a
-                          className="dropdown-item"
-                          href="#"
-                          onClick={e => {
-                            e.preventDefault();
-                            onVisualizarUsuariosClick?.();
-                          }}
-                        >
-                          Visualizar Usuários
-                        </a>
-                      </li>
-                      <li>
-                        <a className="dropdown-item" href="/monitoramento/usuarios/atualizar">
-                          Atualizar Usuário
-                        </a>
-                      </li>
-                      <li>
-                        <a className="dropdown-item" href="/monitoramento/usuarios/deletar">
-                          Deletar Usuário
-                        </a>
-                      </li>
-                    </ul>
-                  </div>
-                  <a className="dropdown-item" href="/monitoramento/agendas">
-                    Agendas
-                  </a>
-                  <a className="dropdown-item" href="/monitoramento/erros">
-                    Erros
-                  </a>
-                </div>
+                  </li>
+                  <li>
+                    <a
+                      className="dropdown-item"
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        onAtualizarUsuariosClick();
+                      }}
+                    >
+                      Atualizar Usuário
+                    </a>
+                  </li>
+                </ul>
               </li>
             </ul>
           )}
 
-          <form className="d-flex align-items-center gap-2">
-            <a className="nav-link" href="/suporte">Suporte</a>
+          <div className="d-flex align-items-center">
             <button
-              className={`btn btn-outline-${theme === 'light' ? 'dark' : 'light'}`}
-              type="button"
-              onClick={onToggleTheme}
+              className={`btn btn-outline-${
+                theme === "light" ? "dark" : "light"
+              } me-2`}
+              onClick={handleThemeToggle}
             >
-              Modo {theme === 'light' ? 'Escuro' : 'Claro'}
+              <FaLightbulb style={{ color: bulbOn ? "#FFD700" : "#888" }} />
             </button>
             {isLoggedIn && (
               <button
                 className="btn btn-outline-danger"
-                type="button"
-                onClick={handleLogout}
+                onClick={() => {
+                  localStorage.removeItem("authToken");
+                  navigate("/");
+                }}
               >
                 Logout
               </button>
             )}
-          </form>
+          </div>
         </div>
       </div>
     </nav>
@@ -191,14 +165,11 @@ function NavBarLog({
 }
 
 NavBarLog.propTypes = {
-  onVisualizarUsuariosClick: PropTypes.func,
-  onAdicionarUsuariosClick: PropTypes.func,
-  onAddTaskClick:       PropTypes.func.isRequired,
-  onViewTasksClick:     PropTypes.func.isRequired,
-  onHomeClick:          PropTypes.func.isRequired,
-  theme:                PropTypes.oneOf(['light', 'dark']).isRequired,
-  onToggleTheme:        PropTypes.func.isRequired,
-  onLogout:             PropTypes.func,  // novo
+  onHomeClick: PropTypes.func.isRequired,
+  onAddTaskClick: PropTypes.func.isRequired,
+  onViewTasksClick: PropTypes.func.isRequired,
+  onVisualizarUsuariosClick: PropTypes.func.isRequired,
+  onAtualizarUsuariosClick: PropTypes.func.isRequired,
+  onToggleTheme: PropTypes.func.isRequired,
+  theme: PropTypes.oneOf(["light", "dark"]).isRequired,
 };
-
-export default NavBarLog;

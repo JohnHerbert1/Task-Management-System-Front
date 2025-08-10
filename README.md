@@ -32,25 +32,13 @@ O sistema de gerenciamento de tarefas é uma aplicação web desenvolvida com o 
 
    * Marque tarefas como concluídas com apenas um clique.
 
-4. ### **📆 Visão de Agenda**
-
-   * Acompanhe suas tarefas em uma visualização de calendário para facilitar o planejamento da sua semana ou mês.
-
-5. ### **🔔 Lembretes e Notificações**
+4. ### **🔔 Lembretes e Notificações**
 
    * Receba alertas automáticos sobre prazos de tarefas que estão próximas do vencimento.
 
-6. ### **👥 Funcionalidades adicionais (A depender do cronograma da disciplina)**
-
-   * Crie múltiplos usuários e permita o gerenciamento de tarefas em equipe (Gestão de Usuários).
-
-   * Atribua tarefas a usuários diferentes e acompanhe o progresso de cada um (Gestão de Usuários).
+5. ### **👥 Funcionalidades adicionais (A depender do cronograma da disciplina)**
 
    * Priorização automática de tarefas (com base em deadlines, urgência e impacto).
-  
-   * Integração com e-mail, Slack, Notion ou Google Calendar para importar tarefas e prazos.
-  
-   * Chat por tarefa ou projeto, com histórico
   
    * Quadros personalizados estilo Kanban com filtros avançados (por prioridade, prazo, responsável etc).
   
@@ -135,20 +123,10 @@ The Task Management System is a web application designed to help users organize 
 
 * Mark tasks as completed with a single click.
 
-4. ### **📆 Calendar View**
-* Track your tasks using a calendar view to better plan your week or month.
-
-5. ### **🔔 Reminders and Notifications**
+4. ### **🔔 Reminders and Notifications**
 * Receive automatic alerts for tasks nearing their deadlines.
 
-6. ### **👥 Additional Features (Depending on the Course Schedule)**
-* Multi-user support and team task management (User Management).
-
-* Assign tasks to different users and track their progress (User Management).
-
-* Automatic task prioritization (based on deadlines, urgency, and impact).
-
-* Integration with email, Slack, Notion, or Google Calendar (for task import and synchronization).
+5. ### **👥 Additional Features (Depending on the Course Schedule)**
 
 * Per-task or per-project chat (with message history).
 

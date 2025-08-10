@@ -1,0 +1,109 @@
+
+/* ResetSenha.css */
+.reset-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f6f9ff 0%, #e8f0ff 100%);
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.reset-box {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(18, 38, 63, 0.08);
+  padding: 28px;
+  box-sizing: border-box;
+}
+
+.reset-title {
+  margin: 0 0 16px;
+  text-align: center;
+  font-size: 20px;
+  color: #12324a;
+}
+
+.reset-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.reset-label {
+  font-size: 13px;
+  color: #344d5b;
+  margin-bottom: 6px;
+}
+
+.reset-input {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #dbe7f0;
+  outline: none;
+  font-size: 14px;
+  transition: border-color .15s ease;
+}
+
+.reset-input:focus {
+  border-color: #6aa0ff;
+  box-shadow: 0 0 0 4px rgba(106,160,255,0.08);
+}
+
+.reset-btn {
+  margin-top: 8px;
+  background: #2f80ed;
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background .12s ease;
+}
+
+.reset-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.reset-btn:hover:not(:disabled) {
+  background: #256ed6;
+}
+
+.reset-back {
+  margin-top: 8px;
+  background: transparent;
+  border: none;
+  color: #2f80ed;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 14px;
+}
+
+.reset-message {
+  margin-bottom: 8px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.reset-message.info {
+  background: #eef6ff;
+  color: #1f6feb;
+}
+
+.reset-message.success {
+  background: #e6ffef;
+  color: #0a8a4b;
+}
+
+.reset-message.error {
+  background: #fff0f0;
+  color: #c0392b;
+}
+

@@ -6,6 +6,7 @@ import App from "./App.jsx";
 import TelaLogin from "./TelaLogin.jsx";
 import RecuperarSenha from "./RecuperarSenha.jsx";
 import CadastroUsers from "./CadastroUsers.jsx";
+import ResetSenha from "./ResetSenha.jsx";
 import Agenda from "./Agenda.jsx";
 import PrivateRoute from "./components/PrivateRoute.jsx";
 import "./index.css";
@@ -16,7 +17,8 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 const router = createBrowserRouter([
   { path: "/", element: <TelaLogin /> },
   { path: "/cadastro", element: <CadastroUsers /> },
-  { path: "/recuperar-senha", element: <RecuperarSenha /> },
+  { path: "/RecuperarSenha", element: <RecuperarSenha /> },
+ { path: "/reset-password", element: <ResetSenha /> },
 
   {
     element: <PrivateRoute />,

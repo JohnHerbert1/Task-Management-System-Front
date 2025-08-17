@@ -1,9 +1,19 @@
 // src/components/NavBarLog.jsx
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 import { FaLightbulb } from "react-icons/fa";
 
+/**
+ * NavBarLog
+ * - Recebe callbacks para navegação (onHomeClick, onAddTaskClick, ...)
+ * - Lê token do localStorage (chave "authToken")
+ * - Decodifica payload do JWT (sem validação) e verifica roles (roles || authorities)
+ * - Mostra "Visualizar Usuários" somente se houver ROLE_ADMIN no token
+ *
+ * Props obrigatórias: onHomeClick, onAddTaskClick, onViewTasksClick,
+ * onVisualizarUsuariosClick, onAtualizarUsuariosClick, onToggleTheme, theme
+ */
 export default function NavBarLog({
   onHomeClick,
   onAddTaskClick,
@@ -18,16 +28,51 @@ export default function NavBarLog({
   const isLoggedIn = !!token;
   const [bulbOn, setBulbOn] = useState(theme === "dark");
 
+  // decode JWT payload (no verification) safely
+  const parseJwt = (jwt) => {
+    try {
+      const parts = jwt.split(".");
+      if (parts.length !== 3) return null;
+      const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+      // atob may throw if invalid; decodeURIComponent handles UTF-8
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map((c) => {
+            return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+          })
+          .join("")
+      );
+      return JSON.parse(jsonPayload);
+    } catch (e) {
+      return null;
+    }
+  };
+
+  // memoize roles check to avoid re-decoding
+  const isAdmin = useMemo(() => {
+    if (!token) return false;
+    const payload = parseJwt(token);
+    if (!payload) return false;
+    // try common claim names
+    const roles = payload.roles || payload.authorities || payload.authority || [];
+    // roles can be string or array depending on implementation
+    if (Array.isArray(roles)) {
+      return roles.includes("ROLE_ADMIN") || roles.includes("ADMIN");
+    }
+    if (typeof roles === "string") {
+      return roles === "ROLE_ADMIN" || roles === "ADMIN" || roles.split(",").includes("ROLE_ADMIN");
+    }
+    return false;
+  }, [token]);
+
   const handleThemeToggle = () => {
     setBulbOn(!bulbOn);
     onToggleTheme();
   };
 
   return (
-    <nav
-      className={`navbar navbar-expand-lg bg-${theme}`}
-      data-bs-theme={theme}
-    >
+    <nav className={`navbar navbar-expand-lg bg-${theme}`} data-bs-theme={theme}>
       <div className="container-fluid">
         <a
           className="navbar-brand"
@@ -47,6 +92,7 @@ export default function NavBarLog({
         >
           <span className="navbar-toggler-icon"></span>
         </button>
+
         <div className="collapse navbar-collapse" id="navbarNav">
           {isLoggedIn && (
             <ul className="navbar-nav me-auto">
@@ -64,11 +110,7 @@ export default function NavBarLog({
               </li>
 
               <li className="nav-item dropdown">
-                <a
-                  className="nav-link dropdown-toggle"
-                  href="#"
-                  data-bs-toggle="dropdown"
-                >
+                <a className="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
                   Tarefas
                 </a>
                 <ul className="dropdown-menu">
@@ -100,26 +142,26 @@ export default function NavBarLog({
               </li>
 
               <li className="nav-item dropdown">
-                <a
-                  className="nav-link dropdown-toggle"
-                  href="#"
-                  data-bs-toggle="dropdown"
-                >
+                <a className="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
                   Usuários
                 </a>
                 <ul className="dropdown-menu">
-                  <li>
-                    <a
-                      className="dropdown-item"
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        onVisualizarUsuariosClick();
-                      }}
-                    >
-                      Visualizar Usuários
-                    </a>
-                  </li>
+                  {/* Só mostra "Visualizar Usuários" para admins */}
+                  {isAdmin && (
+                    <li>
+                      <a
+                        className="dropdown-item"
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          onVisualizarUsuariosClick();
+                        }}
+                      >
+                        Visualizar Usuários
+                      </a>
+                    </li>
+                  )}
+
                   <li>
                     <a
                       className="dropdown-item"
@@ -139,14 +181,14 @@ export default function NavBarLog({
 
           <div className="d-flex align-items-center">
             <button
-              className={`btn btn-outline-${
-                theme === "light" ? "dark" : "light"
-              } me-2`}
+              className={`btn btn-outline-${theme === "light" ? "dark" : "light"} me-2`}
               onClick={handleThemeToggle}
+              aria-label="Toggle theme"
             >
               <FaLightbulb style={{ color: bulbOn ? "#FFD700" : "#888" }} />
             </button>
-            {isLoggedIn && (
+
+            {isLoggedIn ? (
               <button
                 className="btn btn-outline-danger"
                 onClick={() => {
@@ -155,6 +197,15 @@ export default function NavBarLog({
                 }}
               >
                 Logout
+              </button>
+            ) : (
+              <button
+                className="btn btn-outline-primary"
+                onClick={() => {
+                  navigate("/login");
+                }}
+              >
+                Login
               </button>
             )}
           </div>

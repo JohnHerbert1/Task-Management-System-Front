@@ -4,16 +4,6 @@ import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 import { FaLightbulb } from "react-icons/fa";
 
-/**
- * NavBarLog
- * - Recebe callbacks para navegação (onHomeClick, onAddTaskClick, ...)
- * - Lê token do localStorage (chave "authToken")
- * - Decodifica payload do JWT (sem validação) e verifica roles (roles || authorities)
- * - Mostra "Visualizar Usuários" somente se houver ROLE_ADMIN no token
- *
- * Props obrigatórias: onHomeClick, onAddTaskClick, onViewTasksClick,
- * onVisualizarUsuariosClick, onAtualizarUsuariosClick, onToggleTheme, theme
- */
 export default function NavBarLog({
   onHomeClick,
   onAddTaskClick,
@@ -34,13 +24,10 @@ export default function NavBarLog({
       const parts = jwt.split(".");
       if (parts.length !== 3) return null;
       const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
-      // atob may throw if invalid; decodeURIComponent handles UTF-8
       const jsonPayload = decodeURIComponent(
         atob(base64)
           .split("")
-          .map((c) => {
-            return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
-          })
+          .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
           .join("")
       );
       return JSON.parse(jsonPayload);
@@ -49,19 +36,20 @@ export default function NavBarLog({
     }
   };
 
-  // memoize roles check to avoid re-decoding
   const isAdmin = useMemo(() => {
     if (!token) return false;
     const payload = parseJwt(token);
     if (!payload) return false;
-    // try common claim names
     const roles = payload.roles || payload.authorities || payload.authority || [];
-    // roles can be string or array depending on implementation
     if (Array.isArray(roles)) {
       return roles.includes("ROLE_ADMIN") || roles.includes("ADMIN");
     }
     if (typeof roles === "string") {
-      return roles === "ROLE_ADMIN" || roles === "ADMIN" || roles.split(",").includes("ROLE_ADMIN");
+      return (
+        roles === "ROLE_ADMIN" ||
+        roles === "ADMIN" ||
+        roles.split(",").includes("ROLE_ADMIN")
+      );
     }
     return false;
   }, [token]);
@@ -69,6 +57,27 @@ export default function NavBarLog({
   const handleThemeToggle = () => {
     setBulbOn(!bulbOn);
     onToggleTheme();
+  };
+
+  const handleLogout = async () => {
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    try {
+      await fetch("http://localhost:8080/user/logout", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    } catch (err) {
+      console.error("Erro ao deslogar:", err);
+    } finally {
+      localStorage.removeItem("authToken");
+      navigate("/");
+    }
   };
 
   return (
@@ -110,7 +119,11 @@ export default function NavBarLog({
               </li>
 
               <li className="nav-item dropdown">
-                <a className="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                <a
+                  className="nav-link dropdown-toggle"
+                  href="#"
+                  data-bs-toggle="dropdown"
+                >
                   Tarefas
                 </a>
                 <ul className="dropdown-menu">
@@ -142,11 +155,14 @@ export default function NavBarLog({
               </li>
 
               <li className="nav-item dropdown">
-                <a className="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                <a
+                  className="nav-link dropdown-toggle"
+                  href="#"
+                  data-bs-toggle="dropdown"
+                >
                   Usuários
                 </a>
                 <ul className="dropdown-menu">
-                  {/* Só mostra "Visualizar Usuários" para admins */}
                   {isAdmin && (
                     <li>
                       <a
@@ -181,7 +197,9 @@ export default function NavBarLog({
 
           <div className="d-flex align-items-center">
             <button
-              className={`btn btn-outline-${theme === "light" ? "dark" : "light"} me-2`}
+              className={`btn btn-outline-${
+                theme === "light" ? "dark" : "light"
+              } me-2`}
               onClick={handleThemeToggle}
               aria-label="Toggle theme"
             >
@@ -189,13 +207,7 @@ export default function NavBarLog({
             </button>
 
             {isLoggedIn ? (
-              <button
-                className="btn btn-outline-danger"
-                onClick={() => {
-                  localStorage.removeItem("authToken");
-                  navigate("/");
-                }}
-              >
+              <button className="btn btn-outline-danger" onClick={handleLogout}>
                 Logout
               </button>
             ) : (
